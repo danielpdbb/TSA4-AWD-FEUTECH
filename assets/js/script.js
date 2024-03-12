@@ -1,74 +1,68 @@
 (() => {
-  'use strict'
+  'use strict';
 
-  const getStoredTheme = () => localStorage.getItem('theme')
-  const setStoredTheme = theme => localStorage.setItem('theme', theme)
+  // Function to retrieve the stored theme from local storage
+  const getStoredTheme = () => localStorage.getItem('theme');
 
+  // Function to save the selected theme into local storage
+  const setStoredTheme = (theme) => localStorage.setItem('theme', theme);
+
+  // Function to determine the preferred theme, defaulting to 'dark'
   const getPreferredTheme = () => {
-    const storedTheme = getStoredTheme()
-    if (storedTheme) {
-      return storedTheme
-    }
+    const storedTheme = getStoredTheme();
+    return storedTheme || 'dark';
+  };
 
-    return 'dark';
-  }
-
-  const setTheme = theme => {
+  // Function to apply the selected theme by setting a data attribute on the document root
+  const setTheme = (theme) => {
+    let appliedTheme = theme;
     if (theme === 'auto') {
-      document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
-    } else {
-      document.documentElement.setAttribute('data-bs-theme', theme)
+      appliedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-  }
+    document.documentElement.setAttribute('data-bs-theme', appliedTheme);
+  };
 
-  setTheme(getPreferredTheme())
-
-  const showActiveTheme = (theme, focus = false) => {
-    const themeSwitcher = document.querySelector('#bd-theme')
-
-    if (!themeSwitcher) {
-      return
-    }
-
-    const themeSwitcherText = document.querySelector('#bd-theme-text')
-    const activeThemeIcon = document.querySelector('.theme-icon-active use')
-    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
-    const svgOfActiveBtn = btnToActive.querySelector('svg use').getAttribute('href')
-
+  // Function to visually indicate the active theme on UI components like a toggle switch
+  const showActiveTheme = (theme) => {
     document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
-      element.classList.remove('active')
-      element.setAttribute('aria-pressed', 'false')
-    })
+      element.classList.remove('active');
+      element.setAttribute('aria-pressed', 'false');
+    });
 
-    btnToActive.classList.add('active')
-    btnToActive.setAttribute('aria-pressed', 'true')
-    activeThemeIcon.setAttribute('href', svgOfActiveBtn)
-    const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
-    themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
-
-    if (focus) {
-      themeSwitcher.focus()
+    const activeButton = document.querySelector(`[data-bs-theme-value="${theme}"]`);
+    if (activeButton) {
+      activeButton.classList.add('active');
+      activeButton.setAttribute('aria-pressed', 'true');
     }
-  }
+  };
 
+  // Main function to initialize the theme based on stored preference or system preference
+  const initializeTheme = () => {
+    const preferredTheme = getPreferredTheme();
+    setTheme(preferredTheme);
+    showActiveTheme(preferredTheme);
+
+    // Attach event listeners to theme toggle buttons
+    document.querySelectorAll('[data-bs-theme-value]').forEach(button => {
+      button.addEventListener('click', () => {
+        const selectedTheme = button.getAttribute('data-bs-theme-value');
+        setStoredTheme(selectedTheme);
+        setTheme(selectedTheme);
+        showActiveTheme(selectedTheme);
+      });
+    });
+  };
+
+  // Event listener for changes in system theme preference
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-    const storedTheme = getStoredTheme()
-    if (storedTheme !== 'light' && storedTheme !== 'dark') {
-      setTheme(getPreferredTheme())
+    const storedTheme = getStoredTheme();
+    if (!storedTheme) {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      setTheme(systemTheme);
+      showActiveTheme(systemTheme);
     }
-  })
+  });
 
-  window.addEventListener('DOMContentLoaded', () => {
-    showActiveTheme(getPreferredTheme())
-
-    document.querySelectorAll('[data-bs-theme-value]')
-      .forEach(toggle => {
-        toggle.addEventListener('click', () => {
-          const theme = toggle.getAttribute('data-bs-theme-value')
-          setStoredTheme(theme)
-          setTheme(theme)
-          showActiveTheme(theme, true)
-        })
-      })
-  })
-})()
+  // Initialize the theme when the DOM is fully loaded
+  window.addEventListener('DOMContentLoaded', initializeTheme);
+})();
