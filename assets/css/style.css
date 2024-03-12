@@ -109,42 +109,40 @@ body {
     display: block !important;
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    grid-gap: 30px;
-    align-items: stretch;
-    width: 100%;
-    margin-left: auto; /* Center grid container */
-    margin-right: auto; /* Center grid container */
-    
+/* Flexbox layout for cards */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 0 100px 0 100px; /* Add horizontal padding */
+}
+
+/* For smaller screens, let cards take full width minus the padding */
+@media (max-width: 991.98px) {
+  .mycard {
+    flex: 0 0 calc(100% - 50px); /* Subtract the left and right padding */
+    max-width: calc(100% - 50px); /* Subtract the left and right padding */
   }
-  
-  @media (min-width: 576px) and (max-width: 767.98px) {
-    .grid {
-      width: 540px;
-    }
+
+  /* Positioning Premium in the middle when cards stack */
+  .basic, .standard {
+    order: 1;
   }
-  
-  @media (min-width: 768px) and (max-width: 991.98px) {
-    .grid {
-      width: 720px;
-    }
+  .premium {
+    order: 2;
   }
-  
-  @media (min-width: 992px)
-  {
-    .grid {
-      width: 960px;
-    }
+}
+
+/* For larger screens, cards take equal width */
+@media (min-width: 992px) {
+  .mycard {
+    flex: 1;
+    max-width: calc((100% - 100px) / 3); /* Subtract total gap and padding then divide by 3 */
   }
-  
-  @media (min-width: 1200px)
-  {
-    .grid {
-      width: 1140px;
-    }
-  }
+}
+
+
   
   .mycard {
     text-align: center;
@@ -303,19 +301,7 @@ html[data-bs-theme='dark'] .navbar {
   color: #ffffff; 
 }
 
-/* html[data-bs-theme='light'] .pricing-table h2,
-html[data-bs-theme='light'] .pricing-table .mycard h2,
-html[data-bs-theme='light'] .pricing-table .price h4,
-html[data-bs-theme='light'] .pricing-table .option ul li {
-    color: #020202;
-}
 
-html[data-bs-theme='dark'] .pricing-table h2,
-html[data-bs-theme='dark'] .pricing-table .mycard h2,
-html[data-bs-theme='dark'] .pricing-table .price h4,
-html[data-bs-theme='dark'] .pricing-table .option ul li {
-    color: #f8f9fa; 
-} */
 
 
 
